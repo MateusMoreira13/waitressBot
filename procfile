@@ -1,2 +1,2 @@
-procrelease: ./release-task.sh
+Procrelease: ./release-task.sh
 web: ./bin/waitress
