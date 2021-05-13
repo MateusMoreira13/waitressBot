@@ -1,25 +1,34 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"log"
 	"os"
+	"time"
+
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Olá mundo"))
-}
-
 func main() {
-	result := os.Getenv("PORT")
-	if result == "" {
-		result = fmt.Sprintf("Port doesn't set %s", result)
-		fmt.Println(result)
+	port := os.Getenv("PORT")
+	if port == "" {
+		panic(port)
 	}
-	http.HandleFunc("/", handler)
+	b, err := tb.NewBot(tb.Settings{
+		// You can also set custom API URL.
+		// If field is empty it equals to "https://api.telegram.org".
 
-	err := http.ListenAndServe(":"+result, nil)
+		Token:  "1849565820:AAH1--d2jzrkmOkF251s91RDXu6WbljAC0U",
+		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+	})
+
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+		return
 	}
+
+	b.Handle("/hello", func(m *tb.Message) {
+		b.Send(m.Sender, "Hello World!")
+	})
+
+	b.Start()
 }
