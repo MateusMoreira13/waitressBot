@@ -13,7 +13,7 @@ var b, err = tb.NewBot(tb.Settings{
 	// If field is empty it equals to "https://api.telegram.org".
 
 	Token:  "1849565820:AAH1--d2jzrkmOkF251s91RDXu6WbljAC0U",
-	Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+	Poller: &tb.LongPoller{Timeout: 1 * time.Second},
 })
 
 func main() {
