@@ -16,10 +16,10 @@ var (
 		// You can also set custom API URL.
 		// If field is empty it equals to "https://api.telegram.org".
 
-		Token:  "1849565820:AAH1--d2jzrkmOkF251s91RDXu6WbljAC0U",
+		Token:  os.Getenv("TELEGRAM_TOKEN"),
 		Poller: &tb.LongPoller{Timeout: 1 * time.Second},
 	})
-
+	member      tb.ChatMember
 	badwordlist = []string{"Fuck", "fuck", "shit", "mierda", "🖕"}
 )
 
@@ -36,6 +36,8 @@ func main() {
 
 	b.Handle(tb.OnText, Handler)
 	b.Handle("/info", ReturnInfo)
+	b.Handle("/ban", Ban)
+	b.Handle("/warn", Warn)
 	b.Start()
 }
 
@@ -51,7 +53,24 @@ func Handler(m *tb.Message) {
 
 	// BadWordsParser treats every badword senteces
 	BadwordsParser(m, m.Text)
+}
 
+// Warn to warn users
+func Warn(m *tb.Message) {
+	fmt.Println("inside warn func")
+	member.User = m.ReplyTo.Sender
+	user := GroupUser{User: member.User, Warnings: 1}
+	result := fmt.Sprintf("Warned %s", user.User.Username)
+	b.Send(m.Chat, result)
+}
+
+// Nan function bans members that are troublesome
+func Ban(m *tb.Message) {
+	// Finding the banned member you need
+	// to reply him or her to be banned
+	member.User = m.ReplyTo.Sender
+	member.RestrictedUntil = 90
+	b.Ban(m.Chat, &member)
 }
 
 func BadwordsParser(m *tb.Message, text string) {
